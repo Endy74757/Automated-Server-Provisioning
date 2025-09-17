@@ -4,16 +4,12 @@ variable "project_name" {
   default     = "automated-server-provisioning"
 }
 
-variable "vm_name" {
-  description = "Name of the VirtualBox VM"
-  type        = string
-  default     = "wedserver-01"
-}
+
 
 variable "vm_names" {
   description = "List of VM names to create (use this for multiple VMs)"
   type        = list(string)
-  default     = ["wedserver-01", "docker-01", "k8s"]
+  default     = ["webserver-01", "docker-01", "k8s"]
 }
 
 variable "vm_cpus" {
@@ -44,5 +40,10 @@ variable "boot_wait_seconds" {
   description = "Seconds to wait after each VM is created to allow boot to finish"
   type        = number
   default     = 60
+}
+
+variable "ssh_public_key" {
+  type    = string
+  default = "C:/Users/ASUS/.ssh/id_rsa.pub"
 }
 

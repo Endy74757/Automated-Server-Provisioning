@@ -1,0 +1,15 @@
+- hosts: all
+  become: yes
+  roles:
+    - role: common
+
+- hosts: web_nodes
+  become: yes
+  roles:
+    - role: webserver
+
+- hosts: docker_nodes
+  become: yes
+  roles:
+    - role: docker
+

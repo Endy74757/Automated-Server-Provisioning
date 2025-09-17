@@ -15,3 +15,8 @@ terraform.tfvars
 
 # Local files created by examples
 *.box
+ 
+# Ansible
+Ansible/inventory/hosts.ini
+Ansible/*.retry
+*.retry

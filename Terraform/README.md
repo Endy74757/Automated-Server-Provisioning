@@ -30,5 +30,7 @@ Result:
 Notes:
 - Default image is Ubuntu bionic64 `.box` URL. You can set a local path instead.
 - On Windows, run your shell as Administrator if VirtualBox networking changes are needed.
+- **Host-only network setup**: Ensure DHCP is enabled in VirtualBox Host Network Manager for the host-only adapter.
+- **VM networking**: After VM boots, run `sudo dhclient enp0s8` inside each VM to get IP on the host-only interface.
 
 
