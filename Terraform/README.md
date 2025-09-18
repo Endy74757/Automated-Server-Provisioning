@@ -1,4 +1,4 @@
-# Terraform quick start (VirtualBox VM)
+# Terraform quick start (VirtualBox VMs)
 
 Prereqs:
 - Terraform >= 1.5
@@ -24,13 +24,14 @@ Steps:
    ```
 
 Result:
-- Creates a VirtualBox VM from a `.box` image with host-only networking.
-- Outputs the IPv4 address of the first adapter.
+- Creates 2 web VMs (`web-01`, `web-02`) and 1 control VM (`control-01`)
+- Each VM uses host-only networking with DHCP
+- Outputs IPv4 addresses for web and control VMs separately
 
 Notes:
 - Default image is Ubuntu bionic64 `.box` URL. You can set a local path instead.
 - On Windows, run your shell as Administrator if VirtualBox networking changes are needed.
 - **Host-only network setup**: Ensure DHCP is enabled in VirtualBox Host Network Manager for the host-only adapter.
-- **VM networking**: After VM boots, run `sudo dhclient enp0s8` inside each VM to get IP on the host-only interface.
+- **User data**: Each VM includes cloud-init user data from `user_data.txt`
 
 

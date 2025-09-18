@@ -8,7 +8,6 @@ variable "project_name" {
 
 variable "vm_names" {
   description = "List of VM names to create (use this for multiple VMs)"
-  type        = list(string)
   default     = ["webserver-01", "docker-01", "k8s"]
 }
 
@@ -39,11 +38,17 @@ variable "vm_host_interface" {
 variable "boot_wait_seconds" {
   description = "Seconds to wait after each VM is created to allow boot to finish"
   type        = number
-  default     = 60
+  default     = 30
 }
 
 variable "ssh_public_key" {
   type    = string
-  default = "C:/Users/ASUS/.ssh/id_rsa.pub"
+  default = "C:/Users/ASUS/.ssh/vagrant_insecure"
+}
+
+variable "base_ssh_port" {
+  description = "Base host port for SSH port forwarding; each VM uses base + index"
+  type        = number
+  default     = 2222
 }
 

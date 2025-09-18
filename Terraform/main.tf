@@ -1,17 +1,14 @@
 provider "virtualbox" {}
 provider "time" {}
 
-resource "virtualbox_vm" "vm" {
-  for_each = toset(var.vm_names)
+resource "virtualbox_vm" "web" {
+  count = 2
 
-  name   = each.key
+  name   = format("web-%02d", count.index + 1)
   image  = var.vm_image
   cpus   = var.vm_cpus
   memory = var.vm_memory
-
-  network_adapter {
-    type           = "nat"
-  }
+  user_data = file("${path.module}/user_data.txt")
 
   network_adapter {
     type           = "hostonly"
@@ -19,14 +16,17 @@ resource "virtualbox_vm" "vm" {
   }
 }
 
-# Wait after each VM creation to allow OS to boot
-# resource "time_sleep" "boot_wait" {
-#   for_each       = virtualbox_vm.vm
-#   create_duration = "${var.boot_wait_seconds}s"
-#   depends_on     = [virtualbox_vm.vm]
-# }
+resource "virtualbox_vm" "control" {
+  count = 1
 
+  name   = format("control-%02d", count.index + 1)
+  image  = var.vm_image
+  cpus   = var.vm_cpus
+  memory = var.vm_memory
+  user_data = file("${path.module}/user_data.txt")
 
-
-
-
+  network_adapter {
+    type           = "hostonly"
+    host_interface = var.vm_host_interface
+  }
+}

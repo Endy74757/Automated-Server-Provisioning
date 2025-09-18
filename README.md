@@ -3,9 +3,9 @@
 A local infrastructure automation project that provisions Virtual Machines on Oracle VM VirtualBox using Terraform and configures them with Ansible. Designed as a hands-on portfolio/professional showcase: reproducible builds, clear structure, and pragmatic defaults for Windows hosts.
 
 ### What this project does
-- **Provision VMs (VirtualBox)** via Terraform, supporting multiple VMs in one run
-- **Networking**: NAT + Host‑Only (DHCP) for easy host↔guest access
-- **Outputs**: Exposes per‑VM IPs for downstream tools
+- **Provision VMs (VirtualBox)** via Terraform: 2 web VMs + 1 control VM
+- **Networking**: Host‑Only (DHCP) for easy host↔guest access
+- **Outputs**: Exposes web and control VM IPs separately for downstream tools
 - **Configuration management** with Ansible roles (webserver, docker, common)
 - **Inventory generation** helper script for Ansible
 
@@ -35,7 +35,6 @@ terraform -chdir=Terraform apply -auto-approve
 ```
 
 Key variables (set in `Terraform/variables.tf` or via `-var`):
-- `vm_names` — list of VM names (multi-VM). Example: `["webserver-01", "docker-01", "k8s"]`
 - `vm_image` — VirtualBox `.box` image URL or local path (not an ISO)
 - `vm_cpus`, `vm_memory` — resources per VM
 - `vm_host_interface` — the exact name of the VirtualBox Host‑Only adapter
@@ -43,9 +42,10 @@ Key variables (set in `Terraform/variables.tf` or via `-var`):
 
 Outputs:
 ```powershell
-terraform -chdir=Terraform output vm_ips
+terraform -chdir=Terraform output web_ips
+terraform -chdir=Terraform output control_ips
 ```
-This returns a map of VM name → IPv4 address (host‑only adapter).
+This returns maps of VM name → IPv4 address (host‑only adapter) for web and control VMs separately.
 
 ### VirtualBox networking notes (Windows)
 - Ensure a Host‑Only adapter exists and **DHCP is enabled** (VirtualBox → File → Host Network Manager)
@@ -60,6 +60,14 @@ sudo dhclient enp0s8
 ```
 to acquire a DHCP address on the host‑only interface.
 
+### Internet access for VMs
+- **Default setup**: VMs only have Host‑Only networking (no internet access)
+- **To enable internet**: Manually add a NAT adapter in VirtualBox GUI:
+  1. Right-click VM → Settings → Network
+  2. Adapter 2 tab → Enable Network Adapter → Attached to: NAT
+  3. Apply → Start VM
+  4. Inside VM, run: `sudo dhclient enp0s3` (or check interface name with `ip link`)
+
 ### 2) Ansible: configure the VMs
 Update/generate inventory from Terraform outputs:
 ```powershell
@@ -71,11 +79,11 @@ ansible-playbook -i Ansible/inventory/hosts.ini Ansible/playbooks/site.yml
 ```
 
 ## Common tasks
-- Create multiple VMs: set `vm_names = ["web-01","web-02","db-01"]`
 - Inspect resources:
 ```powershell
 terraform -chdir=Terraform state list
-terraform -chdir=Terraform state show virtualbox_vm.vm["web-01"]
+terraform -chdir=Terraform state show virtualbox_vm.web[0]
+terraform -chdir=Terraform state show virtualbox_vm.control[0]
 ```
 - Show outputs without apply (planned values):
 ```powershell
@@ -88,9 +96,9 @@ terraform -chdir=Terraform plan -out tfplan
 - VM not ready / IP is empty:
   - Use a VirtualBox `.box` with Guest Additions (ISO is not supported by the provider)
   - Ensure Host‑Only DHCP is enabled
-  - Use NAT on adapter 0 and Host‑Only on adapter 1 if you customize networking
   - Inside guest, run `sudo dhclient enp0s8`
-- Increase readiness timeouts by using images that boot faster and adjusting `boot_wait_seconds`
+
+- Check VM status in VirtualBox GUI if Terraform times out
 
 ## Roadmap / Ideas
 - Output SSH connection info and generate Ansible inventory automatically on `apply`
