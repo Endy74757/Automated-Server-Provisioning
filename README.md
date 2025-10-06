@@ -104,6 +104,3 @@ terraform -chdir=Terraform plan -out tfplan
 - Output SSH connection info and generate Ansible inventory automatically on `apply`
 - Provisioners or cloud‑init style first‑boot customization
 - Optional providers or backends for remote state
-
-## License
-MIT — use freely for learning and showcasing your automation skills.
